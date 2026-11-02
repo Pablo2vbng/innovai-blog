@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "verifactu-2028-pymes-autonomos",
+      "title": "Verifactu 2028: qué está confirmado y qué deben hacer las pymes",
+      "description": "Hacienda anuncia que Verifactu se retrasa a 2028, pero aún no está en el BOE. Fechas vigentes, factura electrónica y qué hacer en tu negocio.",
+      "category": "Pymes",
+      "date": "2026-11-02",
+      "publish_at": "2026-11-03T08:34:50+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "inteligencia-artificial-pymes-datos-ine-2026",
       "title": "Inteligencia artificial para pymes: qué dicen los datos del INE 2026",
       "description": "Una de cada tres empresas españolas ya usa IA y las microempresas pasan del 13,4 % al 21,4 %. Qué usos funcionan y cómo empezar en tu negocio.",
