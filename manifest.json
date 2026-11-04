@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "tarjeta-nfc-resenas-google",
+      "title": "Tarjeta NFC para reseñas de Google: cómo funciona y cómo usarla",
+      "description": "Qué es una tarjeta NFC para reseñas de Google, qué móviles la leen, cómo configurarla paso a paso, dónde colocarla y qué normas de Google cumplir.",
+      "category": "Pymes",
+      "date": "2026-11-04",
+      "publish_at": "2026-11-05T14:25:21+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "verifactu-2028-pymes-autonomos",
       "title": "Verifactu 2028: qué está confirmado y qué deben hacer las pymes",
       "description": "Hacienda anuncia que Verifactu se retrasa a 2028, pero aún no está en el BOE. Fechas vigentes, factura electrónica y qué hacer en tu negocio.",
