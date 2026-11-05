@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "que-debe-tener-pagina-web-pyme",
+      "title": "Qué debe tener la página web de una pyme: checklist 2026",
+      "description": "Qué debe tener la página web de una pyme para traer clientes: contenido, contacto, móvil, velocidad, Google y datos legales obligatorios. Checklist práctica.",
+      "category": "Pymes",
+      "date": "2026-11-05",
+      "publish_at": "2026-11-06T08:25:58+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "tarjeta-nfc-resenas-google",
       "title": "Tarjeta NFC para reseñas de Google: cómo funciona y cómo usarla",
       "description": "Qué es una tarjeta NFC para reseñas de Google, qué móviles la leen, cómo configurarla paso a paso, dónde colocarla y qué normas de Google cumplir.",
