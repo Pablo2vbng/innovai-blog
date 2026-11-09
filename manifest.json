@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "diseno-web-xativa",
+      "title": "Diseño web en Xàtiva: guía para pymes y comercios",
+      "description": "Diseño web en Xàtiva: qué tipo de web necesita tu negocio, qué debe incluir el presupuesto, cómo elegir quién te la hace y cómo aparecer en Google en la Costera.",
+      "category": "Pymes",
+      "date": "2026-11-09",
+      "publish_at": "2026-11-10T08:25:11+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "que-debe-tener-pagina-web-pyme",
       "title": "Qué debe tener la página web de una pyme: checklist 2026",
       "description": "Qué debe tener la página web de una pyme para traer clientes: contenido, contacto, móvil, velocidad, Google y datos legales obligatorios. Checklist práctica.",
