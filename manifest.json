@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "como-conseguir-resenas-google-negocio",
+      "title": "Cómo conseguir reseñas en Google para tu negocio (guía 2026)",
+      "description": "Cómo conseguir reseñas en Google para tu negocio: enlace directo, 8 formas de pedirlas, plantillas para WhatsApp y email, normas de Google y datos personales.",
+      "category": "Pymes",
+      "date": "2026-11-12",
+      "publish_at": "2026-11-13T08:26:27+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "diseno-web-xativa",
       "title": "Diseño web en Xàtiva: guía para pymes y comercios",
       "description": "Diseño web en Xàtiva: qué tipo de web necesita tu negocio, qué debe incluir el presupuesto, cómo elegir quién te la hace y cómo aparecer en Google en la Costera.",
@@ -25,10 +35,10 @@
       "title": "Tarjeta NFC para reseñas de Google: cómo funciona y cómo usarla",
       "description": "Qué es una tarjeta NFC para reseñas de Google, qué móviles la leen, cómo configurarla paso a paso, dónde colocarla y qué normas de Google cumplir.",
       "category": "Pymes",
-      "date": "2026-11-04",
-      "publish_at": "2026-11-04T14:41:15+00:00",
-      "status": "aprobado",
-      "rev": 1
+      "date": "2026-11-12",
+      "publish_at": "2026-11-13T08:26:27+00:00",
+      "status": "pendiente",
+      "rev": 2
     },
     {
       "slug": "verifactu-2028-pymes-autonomos",
