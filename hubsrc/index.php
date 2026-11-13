@@ -45,7 +45,7 @@ $flash = $_SESSION['flash'] ?? ''; unset($_SESSION['flash']);
 <style>
 :root{--bg:#05070B;--card:#0E141F;--line:#1D2636;--txt:#F3F6FA;--mut:#97A3B6;--blue:#2F6BFF;--ok:#3DD68C;--bad:#FF6B6B}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-.w{max-width:980px;margin:0 auto;padding:24px 16px 60px}header{display:flex;align-items:center;gap:12px;margin-bottom:22px}header img{width:40px;height:40px;border-radius:9px}
+.w{max-width:1120px;margin:0 auto;padding:24px 16px 60px}header{display:flex;align-items:center;gap:12px;margin-bottom:22px}header img{width:40px;height:40px;border-radius:9px}
 h1{font-size:22px;margin:0}h1 span{color:var(--blue)}h2{font-size:17px;margin:0 0 12px}.sub{color:var(--mut);font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
@@ -57,6 +57,7 @@ code,.mono{font:12.5px ui-monospace,Consolas,monospace;word-break:break-all;back
 .flash{background:#10213F;border:1px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:16px}.err{background:#3A1515;border-color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px solid var(--line);padding:6px 4px;vertical-align:top}td:first-child{white-space:nowrap;color:var(--blue)}
 .login{max-width:380px;margin:12vh auto}
+.tabs{display:flex;gap:6px;margin:-6px 0 18px;border-bottom:1px solid var(--line)}.tabs a{color:var(--mut);text-decoration:none;padding:9px 12px;font-weight:600;font-size:14px;border-bottom:2px solid transparent;margin-bottom:-1px}.tabs a.on{color:var(--txt);border-color:var(--blue)}
 </style></head><body><div class="w">
 <header><img src="/img/icono-innovai-180.png" alt=""><div><h1>innov<span>AI</span> Hub</h1><div class="sub">Tu centro propio de redes y Google · v<?= HUB_VERSION ?></div></div>
 <?php if (is_admin()): ?><form method="post" style="margin-left:auto"><input type="hidden" name="csrf" value="<?= csrf() ?>"><button class="sec" name="act" value="logout">Salir</button></form><?php endif; ?></header>
@@ -70,6 +71,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px so
 <?php elseif (!is_admin()): ?>
 <div class="card login"><h2>Entrar</h2><form method="post"><input type="hidden" name="act" value="login"><label>Contraseña</label><input type="password" name="pass" required autocomplete="current-password"><p><button>Entrar</button></p></form></div>
 <?php else: $m = tok('meta'); $g = tok('google'); $l = tok('linkedin'); $base = base_url(); ?>
+<?php $v = ($_GET['v'] ?? 'resultados') === 'ajustes' ? 'ajustes' : 'resultados'; ?>
+<nav class="tabs"><a href="?v=resultados" class="<?= $v === 'resultados' ? 'on' : '' ?>">Resultados</a><a href="?v=ajustes" class="<?= $v === 'ajustes' ? 'on' : '' ?>">Conexiones y ajustes</a></nav>
+<?php if ($v === 'resultados'): include __DIR__ . '/lib/panel.html.php'; else: ?>
 <?php $lok = $l && ($l['expires'] ?? 0) > time(); $lsoon = $lok && $l['expires'] - time() < 10 * 86400; $todo = $m && $g && $lok && !$lsoon; ?>
 <div class="card"><h2>Conexiones</h2>
 <?php if ($todo): ?><div class="okall">✓ Todo conectado. No tienes que pulsar nada: las conexiones se renuevan solas.</div><?php endif; ?>
@@ -92,4 +96,4 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px so
 <div><label><?= h($f[1]) ?><?= $sec && cfg($f[0]) ? ' · <span style="color:var(--ok)">guardada</span>' : '' ?></label><input name="<?= $f[0] ?>" <?= $sec ? 'type="password" autocomplete="new-password" placeholder="' . (cfg($f[0]) ? '•••••• (déjalo vacío para no cambiarla)' : '') . '"' : 'value="' . h((string)cfg($f[0], '')) . '"' ?>></div>
 <?php endforeach; ?></div><p><button>Guardar</button></p></form></div>
 <div class="card"><h2>Herramientas disponibles (<?= count($GLOBALS['HUB_TOOLS']) ?>)</h2><table><?php foreach ($GLOBALS['HUB_TOOLS'] as $n => $t): ?><tr><td><?= h($n) ?></td><td><?= h($t['description']) ?></td></tr><?php endforeach; ?></table></div>
-<?php endif; ?></div></body></html>
+<?php endif; endif; ?></div></body></html>
