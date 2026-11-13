@@ -129,5 +129,8 @@ tool('meta_diagnostico', 'Comprueba la conexión con Meta: permisos concedidos e
         $perm = meta_g('GET', 'me/permissions', [], $t['user_token'])['data'] ?? [];
         $page = meta_g('GET', $t['page_id'], ['fields' => 'name,instagram_business_account{id,username},connected_instagram_account{id,username}']);
         $ig = $page['instagram_business_account'] ?? $page['connected_instagram_account'] ?? null;
+        $todas = meta_g('GET', 'me/accounts', ['fields' => 'id,name,access_token,instagram_business_account{id,username}'], $t['user_token'])['data'] ?? [];
+        if (!$ig) foreach ($todas as $pg) if (!empty($pg['instagram_business_account'])) { $ig = $pg['instagram_business_account']; $t['page_id'] = $pg['id']; $t['page_name'] = $pg['name']; $t['page_token'] = $pg['access_token']; break; }
+        $page['otras_paginas'] = array_map(fn($pg) => ['id' => $pg['id'], 'name' => $pg['name'], 'ig' => $pg['instagram_business_account']['username'] ?? null], $todas);
         if ($ig) { $t['ig_id'] = $ig['id']; $t['ig_username'] = $ig['username'] ?? null; tok_set('meta', $t); }
         return ['permisos' => array_map(fn($p) => $p['permission'] . ':' . $p['status'], $perm), 'pagina' => $page, 'instagram_guardado' => $ig]; });
