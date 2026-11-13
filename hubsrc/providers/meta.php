@@ -123,3 +123,11 @@ tool('facebook_comentarios', 'Comentarios de una publicación de la página de F
     fn($a) => meta_g('GET', need($a, 'post_id') . '/comments', ['fields' => 'id,message,from,created_time'])['data'] ?? []);
 tool('facebook_responder_comentario', 'Responde a un comentario en la página de Facebook.', ['comment_id' => ['string', 'ID del comentario', true], 'mensaje' => ['string', 'Texto', true]],
     fn($a) => meta_g('POST', need($a, 'comment_id') . '/comments', ['message' => need($a, 'mensaje')]), true);
+
+tool('meta_diagnostico', 'Comprueba la conexión con Meta: permisos concedidos e Instagram vinculado a la página. Si encuentra la cuenta de Instagram, la guarda.', [],
+    function ($a) { $t = tok('meta'); if (!$t) throw new RuntimeException('Meta no está conectado.');
+        $perm = meta_g('GET', 'me/permissions', [], $t['user_token'])['data'] ?? [];
+        $page = meta_g('GET', $t['page_id'], ['fields' => 'name,instagram_business_account{id,username},connected_instagram_account{id,username}']);
+        $ig = $page['instagram_business_account'] ?? $page['connected_instagram_account'] ?? null;
+        if ($ig) { $t['ig_id'] = $ig['id']; $t['ig_username'] = $ig['username'] ?? null; tok_set('meta', $t); }
+        return ['permisos' => array_map(fn($p) => $p['permission'] . ':' . $p['status'], $perm), 'pagina' => $page, 'instagram_guardado' => $ig]; });
