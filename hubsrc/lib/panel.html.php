@@ -35,7 +35,12 @@
     return `<span class="${p > 0 ? 'up' : p < 0 ? 'down' : 'flat'}">${p > 0 ? '▲' : p < 0 ? '▼' : '='} ${Math.abs(p)} %</span> <span class="flat">vs 28 días antes</span>`;
   }
   // Divide una serie diaria en los últimos 28 días y los 28 anteriores.
-  function split(rows) { const cur = rows.slice(-28), prev = rows.slice(-56, -28); return [cur, prev]; }
+  function split(rows) {
+    const last = rows.length ? rows[rows.length - 1][0] : new Date().toISOString().slice(0, 10);
+    const back = (k) => { const t = new Date(last + 'T12:00:00'); t.setDate(t.getDate() - k); return t.toISOString().slice(0, 10); };
+    const a = back(27), b = back(55);
+    return [rows.filter(r => r[0] >= a), rows.filter(r => r[0] >= b && r[0] < a)];
+  }
 
   function lineChart(el, rows, series) {
     const W = Math.max(280, el.clientWidth), H = 170, P = {l: 34, r: 8, t: 10, b: 22};
