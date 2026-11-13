@@ -51,7 +51,7 @@ h1{font-size:22px;margin:0}h1 span{color:var(--blue)}h2{font-size:17px;margin:0 
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .conn{border:1px solid var(--line);border-radius:12px;padding:14px}.conn b{display:block;font-size:15px}.st{font-size:13px;margin:4px 0 10px}.st.ok{color:var(--ok)}.st.no{color:var(--mut)}
 a.btn,button{display:inline-block;background:var(--blue);color:#fff;border:0;border-radius:9px;padding:9px 14px;font:600 14px system-ui;text-decoration:none;cursor:pointer}
-button.sec{background:transparent;border:1px solid var(--line);color:var(--mut)}a.btn.dis{opacity:.4;pointer-events:none}
+button.sec,a.btn.sec{background:transparent;border:1px solid var(--line);color:var(--mut);font-weight:500;font-size:13px;padding:6px 11px}.st.warn{color:#f5b942}.okall{background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.35);color:var(--ok);border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:14px}a.btn.dis{opacity:.4;pointer-events:none}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}input{width:100%;background:#070B12;border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 11px;font:14px system-ui}
 code,.mono{font:12.5px ui-monospace,Consolas,monospace;word-break:break-all;background:#070B12;border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:block}
 .flash{background:#10213F;border:1px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:16px}.err{background:#3A1515;border-color:var(--bad)}
@@ -70,13 +70,16 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px so
 <?php elseif (!is_admin()): ?>
 <div class="card login"><h2>Entrar</h2><form method="post"><input type="hidden" name="act" value="login"><label>Contraseña</label><input type="password" name="pass" required autocomplete="current-password"><p><button>Entrar</button></p></form></div>
 <?php else: $m = tok('meta'); $g = tok('google'); $l = tok('linkedin'); $base = base_url(); ?>
-<div class="card"><h2>Conexiones</h2><div class="grid">
- <div class="conn"><b>Meta · Instagram + Facebook</b><div class="st <?= $m ? 'ok' : 'no' ?>"><?= $m ? '● ' . h($m['page_name']) . ($m['ig_username'] ? ' · @' . h($m['ig_username']) : '') : '○ Sin conectar' ?></div>
-  <a class="btn<?= cfg('meta_app_id') && cfg('meta_app_secret') ? '' : ' dis' ?>" href="?connect=meta"><?= $m ? 'Reconectar' : 'Conectar Meta' ?></a></div>
- <div class="conn"><b>Google · Business, Search Console, Merchant, Analytics</b><div class="st <?= $g ? 'ok' : 'no' ?>"><?= $g ? '● ' . h($g['email']) : '○ Sin conectar' ?></div>
-  <a class="btn<?= cfg('google_client_id') && cfg('google_client_secret') ? '' : ' dis' ?>" href="?connect=google"><?= $g ? 'Reconectar' : 'Conectar Google' ?></a></div>
- <div class="conn"><b>LinkedIn · perfil personal</b><div class="st <?= $l && ($l['expires'] ?? 0) > time() ? 'ok' : 'no' ?>"><?= $l ? (($l['expires'] ?? 0) > time() ? '● ' . h($l['name']) . ' · caduca el ' . date('d/m/Y', $l['expires']) : '○ Caducado: vuelve a conectar') : '○ Sin conectar' ?></div>
-  <a class="btn<?= cfg('linkedin_client_id') && cfg('linkedin_client_secret') ? '' : ' dis' ?>" href="?connect=linkedin"><?= $l ? 'Reconectar' : 'Conectar LinkedIn' ?></a></div>
+<?php $lok = $l && ($l['expires'] ?? 0) > time(); $lsoon = $lok && $l['expires'] - time() < 10 * 86400; $todo = $m && $g && $lok && !$lsoon; ?>
+<div class="card"><h2>Conexiones</h2>
+<?php if ($todo): ?><div class="okall">✓ Todo conectado. No tienes que pulsar nada: las conexiones se renuevan solas.</div><?php endif; ?>
+<div class="grid">
+ <div class="conn"><b>Meta · Instagram + Facebook</b><div class="st <?= $m ? 'ok' : 'no' ?>"><?= $m ? '✓ Conectado · ' . h($m['page_name']) . ($m['ig_username'] ? ' · @' . h($m['ig_username']) : '') : '○ Sin conectar' ?></div>
+  <a class="btn<?= $m ? ' sec' : '' ?><?= cfg('meta_app_id') && cfg('meta_app_secret') ? '' : ' dis' ?>" href="?connect=meta"><?= $m ? 'Reconectar (solo si falla)' : 'Conectar Meta' ?></a></div>
+ <div class="conn"><b>Google · Business, Search Console, Merchant, Analytics</b><div class="st <?= $g ? 'ok' : 'no' ?>"><?= $g ? '✓ Conectado · ' . h($g['email']) : '○ Sin conectar' ?></div>
+  <a class="btn<?= $g ? ' sec' : '' ?><?= cfg('google_client_id') && cfg('google_client_secret') ? '' : ' dis' ?>" href="?connect=google"><?= $g ? 'Reconectar (solo si falla)' : 'Conectar Google' ?></a></div>
+ <div class="conn"><b>LinkedIn · perfil personal</b><div class="st <?= $lsoon ? 'warn' : ($lok ? 'ok' : 'no') ?>"><?= $l ? ($lok ? ($lsoon ? '⚠ Caduca el ' . date('d/m/Y', $l['expires']) . ': pulsa Renovar' : '✓ Conectado · ' . h($l['name']) . ' · renovar antes del ' . date('d/m/Y', $l['expires'])) : '○ Caducado: pulsa Renovar') : '○ Sin conectar' ?></div>
+  <a class="btn<?= $lok && !$lsoon ? ' sec' : '' ?><?= cfg('linkedin_client_id') && cfg('linkedin_client_secret') ? '' : ' dis' ?>" href="?connect=linkedin"><?= $l ? ($lok && !$lsoon ? 'Reconectar (solo si falla)' : 'Renovar') : 'Conectar LinkedIn' ?></a></div>
  <div class="conn"><b>ChatGPT para negocios · catálogo</b><div class="st ok">● <?= count(chatgpt_products()) ?> productos en el feed</div><div class="sub">Pega esta URL en Business Hub → Productos → «Usar una URL alojada»:</div><code><?= h(chatgpt_feed_url()) ?></code></div>
 </div></div>
 <div class="card"><h2>Conector para Claude</h2><p class="sub">En claude.ai → Configuración → Conectores → «Añadir conector personalizado», pega esta URL (es secreta: no la compartas).</p>
