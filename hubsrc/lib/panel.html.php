@@ -73,7 +73,7 @@
     const k = [];
     if (web.ok) { const [c, p] = split(web.d.diario); k.push(['Visitas a la web', sum(c, 1), delta(sum(c, 1), sum(p, 1))]); }
     if (go.ok) { const [c, p] = split(go.d.diario); k.push(['Clics desde Google', sum(c, 1), delta(sum(c, 1), sum(p, 1))]); k.push(['Veces que sales en Google', sum(c, 2), delta(sum(c, 2), sum(p, 2))]); }
-    if (ig.ok) { k.push(['Seguidores Instagram', ig.d.seguidores, `<span class="flat">@${esc(ig.d.usuario)}</span>`]); k.push(['Alcance Instagram', sum(ig.d.alcance_diario, 1), '<span class="flat">cuentas alcanzadas</span>']); }
+    if (ig.ok) { k.push(['Seguidores Instagram', ig.d.seguidores, `<span class="flat">@${esc(ig.d.usuario)}</span>`]); k.push(['Alcance Instagram', sum(ig.d.alcance_diario, 1), '<span class="flat">suma del alcance de cada día</span>']); }
     if (fb.ok) k.push(['Seguidores Facebook', fb.d.seguidores, `<span class="flat">${esc(fb.d.pagina)}</span>`]);
     root.append($(`<div class="kpis">${k.map(x => `<div class="kpi"><div class="l">${x[0]}</div><div class="n">${n(x[1])}</div><div class="c">${x[2]}</div></div>`).join('')}</div>`));
 

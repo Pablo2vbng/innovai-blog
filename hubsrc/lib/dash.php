@@ -31,7 +31,7 @@ function dash_build(): array {
 
     $d['instagram'] = dash_try(function () {
         $c = dash_tool('instagram_estadisticas_cuenta', ['dias' => 28]);
-        $posts = dash_tool('instagram_publicaciones', ['limite' => 8]);
+        $posts = dash_tool('instagram_publicaciones', ['limite' => 6]);
         foreach (array_slice($posts, 0, 6) as $i => $p) {
             foreach (['reach', 'views', 'saved', 'shares'] as $m) {
                 try { $r = meta_g('GET', $p['id'] . '/insights', ['metric' => $m]); $posts[$i][$m] = $r['data'][0]['values'][0]['value'] ?? null; }
