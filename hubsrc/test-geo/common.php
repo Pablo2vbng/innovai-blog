@@ -64,3 +64,12 @@ function tg_mail(string $to, string $subject, string $body, string $replyTo, str
         $log('SMTP ok'); return true;
     } catch (Throwable $e) { @fclose($fp); $log('SMTP error: ' . $e->getMessage()); return false; }
 }
+
+/** Igual que mail() pero enviando por SMTP: lo usan otras herramientas de la web (p. ej. diagnostico-api.php). */
+function tg_mail_compat(string $to, string $subject, string $body, $headers = '', $params = ''): bool {
+    if (preg_match('/^=\?UTF-8\?B\?(.*)\?=$/i', trim($subject), $m)) $subject = (string)base64_decode($m[1]);
+    $reply = 'info@innovai.es';
+    if (is_string($headers) && preg_match('/Reply-To:\s*([^\r\n]+)/i', $headers, $m)) $reply = trim($m[1]);
+    if (preg_match('/<([^>]+)>/', $reply, $m)) $reply = $m[1];
+    return tg_mail($to, $subject, $body, $reply, 'innovAI');
+}
