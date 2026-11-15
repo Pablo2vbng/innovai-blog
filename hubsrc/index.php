@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         csrf_check();
         if ($act === 'config') {
             $fields = ['meta_app_id', 'meta_config_id', 'meta_page_id', 'google_client_id', 'gsc_site', 'merchant_id', 'ga4_property', 'gbp_location', 'linkedin_client_id'];
-            $secrets = ['meta_app_secret', 'google_client_secret', 'linkedin_client_secret'];
+            $secrets = ['meta_app_secret', 'google_client_secret', 'linkedin_client_secret', 'smtp_pass'];
             $kv = []; foreach ($fields as $f) $kv[$f] = trim($_POST[$f] ?? '') ?: null;
             foreach ($secrets as $f) if (trim($_POST[$f] ?? '') !== '') $kv[$f] = trim($_POST[$f]);
             cfg_set($kv); $_SESSION['flash'] = 'Configuración guardada.';
@@ -92,7 +92,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px so
 <div class="card"><h2>Claves de las apps</h2><p class="sub">URLs de redirección que tienes que poner en cada app:</p>
 <table><tr><td>Meta</td><td class="mono"><?= h($base) ?>/oauth/callback.php?p=meta</td></tr><tr><td>Google</td><td class="mono"><?= h($base) ?>/oauth/callback.php?p=google</td></tr><tr><td>LinkedIn</td><td class="mono"><?= h($base) ?>/oauth/callback.php?p=linkedin</td></tr></table>
 <form method="post"><input type="hidden" name="csrf" value="<?= csrf() ?>"><input type="hidden" name="act" value="config"><div class="grid">
-<?php foreach ([['meta_app_id','Meta · ID de la app'],['meta_app_secret','Meta · clave secreta',1],['meta_config_id','Meta · ID del ajuste de inicio de sesión'],['meta_page_id','Meta · ID de página (opcional)'],['google_client_id','Google · ID de cliente'],['google_client_secret','Google · secreto de cliente',1],['gsc_site','Search Console · propiedad (sc-domain:innovai.es)'],['merchant_id','Merchant Center · ID de cuenta'],['ga4_property','Analytics 4 · ID de propiedad (numérico)'],['gbp_location','Google Business · ficha (locations/…)'],['linkedin_client_id','LinkedIn · Client ID'],['linkedin_client_secret','LinkedIn · Client Secret',1]] as $f): $sec = !empty($f[2]); ?>
+<?php foreach ([['meta_app_id','Meta · ID de la app'],['meta_app_secret','Meta · clave secreta',1],['meta_config_id','Meta · ID del ajuste de inicio de sesión'],['meta_page_id','Meta · ID de página (opcional)'],['google_client_id','Google · ID de cliente'],['google_client_secret','Google · secreto de cliente',1],['gsc_site','Search Console · propiedad (sc-domain:innovai.es)'],['merchant_id','Merchant Center · ID de cuenta'],['ga4_property','Analytics 4 · ID de propiedad (numérico)'],['gbp_location','Google Business · ficha (locations/…)'],['linkedin_client_id','LinkedIn · Client ID'],['linkedin_client_secret','LinkedIn · Client Secret',1],['smtp_pass','Correo info@innovai.es · contraseña (para enviar los avisos del Test GEO)',1]] as $f): $sec = !empty($f[2]); ?>
 <div><label><?= h($f[1]) ?><?= $sec && cfg($f[0]) ? ' · <span style="color:var(--ok)">guardada</span>' : '' ?></label><input name="<?= $f[0] ?>" <?= $sec ? 'type="password" autocomplete="new-password" placeholder="' . (cfg($f[0]) ? '•••••• (déjalo vacío para no cambiarla)' : '') . '"' : 'value="' . h((string)cfg($f[0], '')) . '"' ?>></div>
 <?php endforeach; ?></div><p><button>Guardar</button></p></form></div>
 <div class="card"><h2>Herramientas disponibles (<?= count($GLOBALS['HUB_TOOLS']) ?>)</h2><table><?php foreach ($GLOBALS['HUB_TOOLS'] as $n => $t): ?><tr><td><?= h($n) ?></td><td><?= h($t['description']) ?></td></tr><?php endforeach; ?></table></div>

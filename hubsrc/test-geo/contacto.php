@@ -35,8 +35,7 @@ $cuerpo = "Nueva solicitud desde el Test GEO de innovai.es\n\n"
     . "Nombre: $nombre\nCorreo: $email\nTeléfono: " . ($tel ?: '—') . "\nNegocio: " . ($negocio ?: '—') . "\nWeb analizada: $web\nPuntuación GEO: $score/100\n\n"
     . "Puntos a mejorar detectados:\n- " . implode("\n- ", $mejoras ?: ['(ninguno)']) . "\n\n"
     . "Ha aceptado la política de privacidad para que le contactemos sobre esta solicitud.\n";
-$headers = "From: innovAI Test GEO <info@innovai.es>\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8\r\n";
-@mail('info@innovai.es', '=?UTF-8?B?' . base64_encode("🤖 Test GEO: $nombre ($score/100)") . '?=', $cuerpo, $headers, '-finfo@innovai.es');
+tg_mail('info@innovai.es', "🤖 Test GEO: $nombre ($score/100)", $cuerpo, $email, 'innovAI Test GEO');
 
 // Copia del resultado a la persona que lo ha pedido
 $copia = "Hola, $nombre:\n\nGracias por usar el Test GEO de innovAI. Este es el resumen de tu web ($web):\n\nPuntuación: $score/100\n\n"
@@ -44,7 +43,6 @@ $copia = "Hola, $nombre:\n\nGracias por usar el Test GEO de innovAI. Este es el 
     . "Pablo, de innovAI, te escribirá en breve para revisarlo contigo y contarte por dónde empezar, sin compromiso.\n\n"
     . "Un saludo,\nPablo Vidal · innovAI\nhttps://innovai.es · 601 68 97 09\n\n"
     . "Recibes este correo porque has pedido la revisión en innovai.es/test-geo. Responsable: Pablo Vidal Vidal (innovAI). Puedes pedir el acceso, la rectificación o la supresión de tus datos escribiendo a info@innovai.es.\n";
-$h2 = "From: Pablo de innovAI <info@innovai.es>\r\nReply-To: info@innovai.es\r\nContent-Type: text/plain; charset=UTF-8\r\n";
-@mail($email, '=?UTF-8?B?' . base64_encode('Tu resultado del Test GEO de innovAI') . '?=', $copia, $h2, '-finfo@innovai.es');
+tg_mail($email, 'Tu resultado del Test GEO de innovAI', $copia, 'info@innovai.es', 'Pablo de innovAI');
 
 tg_json(['ok' => true]);
