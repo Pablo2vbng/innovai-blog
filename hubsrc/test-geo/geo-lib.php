@@ -2,7 +2,7 @@
 // innovAI · Test GEO: analiza si una web está preparada para que las IA (ChatGPT, Gemini, Perplexity…) la encuentren y la entiendan.
 declare(strict_types=1);
 
-const GEO_UA = 'Mozilla/5.0 (compatible; innovAI-TestGEO/1.0; +https://innovai.es/test-geo/)';
+const GEO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 innovAI-TestGEO/1.0';
 const GEO_MAX_BYTES = 3_000_000;
 
 final class GeoError extends RuntimeException {}
@@ -32,7 +32,7 @@ function geo_host_is_public(string $host): bool {
 function geo_fetch(string $url, int $timeout = 12): array {
     for ($hop = 0; $hop < 5; $hop++) {
         $host = parse_url($url, PHP_URL_HOST) ?: '';
-        if (!geo_host_is_public($host)) throw new GeoError('No hemos podido encontrar esa web. Revisa que la dirección esté bien escrita.');
+        if (!geo_host_is_public($host)) throw new GeoError('No hemos encontrado esa web. Revisa que la dirección esté bien escrita (por ejemplo: minegocio.es).');
         $body = ''; $headers = [];
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -90,6 +90,7 @@ function geo_analyze(string $input): array {
     $r = geo_fetch($url);
     $sslBroken = !empty($r['ssl_error']);
     if ($sslBroken) $r = geo_fetch(preg_replace('~^https://~', 'http://', $url));
+    if (in_array($r['code'], [401, 403, 429, 503], true)) throw new GeoError('Esa web no deja que la analicen herramientas automáticas (suele ser un cortafuegos o protección anti-robots). Ojo: eso también puede impedir que ChatGPT y otras IA la lean. Déjanos tu contacto en info@innovai.es y la revisamos a mano.');
     if ($r['code'] >= 400 || $r['code'] === 0) throw new GeoError('La web ha respondido con un error (' . $r['code'] . '). Revisa la dirección y vuelve a probar.');
     $final = $r['url'];
     $p = parse_url($final);
