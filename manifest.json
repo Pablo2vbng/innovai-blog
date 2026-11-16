@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "diseno-web-ontinyent",
+      "title": "Diseño web en Ontinyent: guía para negocios y pymes",
+      "description": "Diseño web en Ontinyent: qué tipo de web necesita tu negocio, qué debe incluir el presupuesto, web bilingüe y cómo aparecer en Google en la Vall d'Albaida.",
+      "category": "Pymes",
+      "date": "2026-11-16",
+      "publish_at": "2026-11-17T08:23:16+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "como-conseguir-resenas-google-negocio",
       "title": "Cómo conseguir reseñas en Google para tu negocio (guía 2026)",
       "description": "Cómo conseguir reseñas en Google para tu negocio: enlace directo, 8 formas de pedirlas, plantillas para WhatsApp y email, normas de Google y datos personales.",
