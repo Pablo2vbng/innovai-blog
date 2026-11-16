@@ -59,9 +59,15 @@ tool('instagram_publicar_imagen', 'Publica una foto en Instagram (JPEG público,
     fn($a) => ig_publish_container(['image_url' => need($a, 'image_url'), 'caption' => $a['caption'] ?? '']), true);
 tool('instagram_publicar_reel', 'Publica un vídeo como Reel en Instagram (MP4 público, 3 s a 15 min).', [
     'video_url' => ['string', 'URL pública del MP4', true], 'caption' => ['string', 'Texto'], 'cover_url' => ['string', 'URL pública de la portada JPEG'],
-    'share_to_feed' => ['boolean', 'Mostrar también en el feed (por defecto sí)']],
-    function ($a) { $p = ['media_type' => 'REELS', 'video_url' => need($a, 'video_url'), 'caption' => $a['caption'] ?? '', 'share_to_feed' => ($a['share_to_feed'] ?? true) ? 'true' : 'false'];
-        if (!empty($a['cover_url'])) $p['cover_url'] = $a['cover_url']; return ig_publish_container($p); }, true);
+    'share_to_feed' => ['boolean', 'Mostrar también en el feed (por defecto sí; se ignora en los reels de prueba)'],
+    'prueba' => ['string', 'Reel de prueba (solo lo ven quienes no te siguen): «manual» = lo pasas tú a público desde la app; «automatico» = Instagram lo comparte con tus seguidores si funciona bien. Vacío = Reel normal', false, ['enum' => ['', 'manual', 'automatico']]]],
+    function ($a) { $p = ['media_type' => 'REELS', 'video_url' => need($a, 'video_url'), 'caption' => $a['caption'] ?? ''];
+        $prueba = strtolower(trim((string)($a['prueba'] ?? '')));
+        if ($prueba !== '') {
+            $gs = ['manual' => 'MANUAL', 'automatico' => 'SS_PERFORMANCE', 'automático' => 'SS_PERFORMANCE'][$prueba] ?? throw new RuntimeException('prueba debe ser «manual» o «automatico».');
+            $p['trial_params'] = json_encode(['graduation_strategy' => $gs]);
+        } else $p['share_to_feed'] = ($a['share_to_feed'] ?? true) ? 'true' : 'false';
+        if (!empty($a['cover_url'])) $p['cover_url'] = $a['cover_url']; return ig_publish_container($p) + ['prueba' => $prueba !== '']; }, true);
 tool('instagram_publicar_carrusel', 'Publica un carrusel de 2 a 10 imágenes en Instagram.', [
     'image_urls' => ['array', 'URLs públicas de las imágenes, en orden', true, ['items' => ['type' => 'string']]], 'caption' => ['string', 'Texto']],
     function ($a) { $ig = ig_id(); $kids = [];
