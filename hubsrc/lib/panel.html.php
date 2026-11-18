@@ -18,10 +18,12 @@
 .mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}.mini div{background:#0A0F18;border:1px solid var(--line);border-radius:10px;padding:10px}.mini b{display:block;font-size:20px}.mini span{font-size:12px;color:var(--mut)}
 @media(max-width:520px){.kpi .n{font-size:22px}.hide-s{display:none}}
 </style>
-<div class="dh"><h2>Resultados · últimos 28 días</h2><div class="act"><span id="upd">Cargando…</span><button class="sec" id="refresh">Actualizar</button></div></div>
+<?php $PC = (string)($HUB_PANEL_C ?? ''); $PCN = $PC !== '' ? (client_get($PC)['nombre'] ?? $PC) : ''; ?>
+<div class="dh"><h2>Resultados<?= $PCN !== '' ? ' de ' . h($PCN) : '' ?> · últimos 28 días</h2><div class="act"><span id="upd">Cargando…</span><button class="sec" id="refresh">Actualizar</button></div></div>
 <div id="dash"><div class="loading">Reuniendo tus datos de Instagram, Facebook y Google… (la primera vez tarda unos segundos)</div></div>
 <script>
 (function () {
+  const CLI = <?= json_encode($PC) ?>;
   const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstChild; };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const nf = new Intl.NumberFormat('es-ES'); const n = (x) => x == null ? '—' : nf.format(x);
@@ -111,18 +113,22 @@
     // Tienda y otros
     const m = d.merchant, bz = d.business, li = d.linkedin, cg = d.chatgpt;
     const tot = bz.ok ? bz.d.totales || {} : {};
-    root.append($(`<div class="card blk"><h3>Escaparates y otras cuentas</h3><div class="sub">Dónde te pueden encontrar además de tu web</div><div class="mini">
-      <div><b>${m.ok ? n(m.d.aprobados) + ' / ' + n(m.d.total) : '—'}</b><span>productos aprobados en Google Shopping ${m.ok ? '' : '· ' + esc(m.error)}</span></div>
-      <div><b>${cg.ok ? n(cg.d.productos) : '—'}</b><span>productos en el catálogo de ChatGPT</span></div>
-      <div><b>${bz.ok ? n((tot.BUSINESS_IMPRESSIONS_MOBILE_SEARCH || 0) + (tot.BUSINESS_IMPRESSIONS_DESKTOP_SEARCH || 0) + (tot.BUSINESS_IMPRESSIONS_MOBILE_MAPS || 0) + (tot.BUSINESS_IMPRESSIONS_DESKTOP_MAPS || 0)) : '—'}</b><span>vistas de tu ficha de Google ${bz.ok ? '' : '· ' + esc(bz.error)}</span></div>
-      <div><b>${li.ok ? '✓' : '—'}</b><span>LinkedIn ${li.ok ? 'conectado · renovar antes del ' + esc(li.d.caduca) : 'sin conectar'}</span></div></div>
+    const tk = d.tiktok || {ok: false, error: 'Sin conectar'};
+    const cells = [];
+    if (!(m.error === 'No aplica')) cells.push(`<div><b>${m.ok ? n(m.d.aprobados) + ' / ' + n(m.d.total) : '—'}</b><span>productos aprobados en Google Shopping ${m.ok ? '' : '· ' + esc(m.error)}</span></div>`);
+    if (!(cg.error === 'No aplica')) cells.push(`<div><b>${cg.ok ? n(cg.d.productos) : '—'}</b><span>productos en el catálogo de ChatGPT</span></div>`);
+    cells.push(`<div><b>${bz.ok ? n((tot.BUSINESS_IMPRESSIONS_MOBILE_SEARCH || 0) + (tot.BUSINESS_IMPRESSIONS_DESKTOP_SEARCH || 0) + (tot.BUSINESS_IMPRESSIONS_MOBILE_MAPS || 0) + (tot.BUSINESS_IMPRESSIONS_DESKTOP_MAPS || 0)) : '—'}</b><span>vistas de la ficha de Google ${bz.ok ? '' : '· ' + esc(bz.error)}</span></div>`);
+    cells.push(`<div><b>${li.ok ? '✓' : '—'}</b><span>LinkedIn ${li.ok ? 'conectado · renovar antes del ' + esc(li.d.caduca) : 'sin conectar'}</span></div>`);
+    if (CLI) cells.push(`<div><b>${tk.ok ? '✓' : '—'}</b><span>TikTok ${tk.ok ? 'conectado' : '· ' + esc(tk.error)}</span></div>`);
+    root.append($(`<div class="card blk"><h3>Otras cuentas</h3><div class="sub">Dónde te pueden encontrar además de tu web</div><div class="mini">${cells.join('')}</div>
       ${m.ok && m.d.con_problemas.length ? `<div style="margin-top:10px">${m.d.con_problemas.map(p => `<div class="pill no" style="margin:3px 4px 0 0">⚠ ${esc(p.titulo)}: ${esc(p.problema)}</div>`).join('')}</div>` : ''}</div>`));
   }
 
   async function load(force) {
     const upd = document.getElementById('upd'); upd.textContent = force ? 'Actualizando…' : 'Cargando…';
     try {
-      const r = await fetch('datos.php' + (force ? '?actualizar=1' : ''), {credentials: 'same-origin'});
+      const q = new URLSearchParams(); if (CLI) q.set('c', CLI); if (force) q.set('actualizar', '1');
+      const r = await fetch('datos.php' + (q.toString() ? '?' + q : ''), {credentials: 'same-origin'});
       if (!r.ok) throw new Error(r.status === 403 ? 'La sesión ha caducado: vuelve a entrar.' : 'Error ' + r.status);
       const d = await r.json(); render(d);
       const mins = Math.round((Date.now() - new Date(d.generado)) / 60000);

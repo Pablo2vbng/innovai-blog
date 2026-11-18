@@ -6,6 +6,11 @@ require __DIR__ . '/lib/tools.php';
 require __DIR__ . '/lib/dash.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
-if (!is_admin()) { http_response_code(403); echo '{"error":"Sesión caducada"}'; exit; }
+// Pablo puede ver cualquier negocio (?c=cliente); un cliente solo ve el suyo, diga lo que diga la URL.
+if (is_admin()) $c = (string)($_GET['c'] ?? '');
+elseif ($s = client_session()) $c = $s;
+else { http_response_code(403); echo '{"error":"Sesión caducada"}'; exit; }
+try { client_use($c); } catch (Throwable $e) { http_response_code(404); echo '{"error":"Cliente no encontrado"}'; exit; }
 @set_time_limit(120);
-echo json_encode(dash_data(isset($_GET['actualizar'])), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+// Un cliente puede pulsar «Actualizar» como mucho una vez cada 10 minutos.
+echo json_encode(dash_data(isset($_GET['actualizar']), is_admin() ? 0 : 600), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

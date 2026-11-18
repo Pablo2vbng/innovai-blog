@@ -17,10 +17,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!cfg('mcp_key')) cfg_set(['mcp_key' => bin2hex(random_bytes(24))]);
             session_regenerate_id(true); $_SESSION['admin'] = 1; header('Location: index.php'); exit; }
     } elseif ($act === 'login') {
-        $fails = store_get('login_fails', ['n' => 0, 't' => 0]);
+        $u = mb_strtolower(trim((string)($_POST['usuario'] ?? '')));
+        $pass = (string)($_POST['pass'] ?? '');
+        $all = store_get('login_fails', []); if (isset($all['n'])) $all = [];   // formato antiguo
+        $fk = $u === '' ? '·pablo' : $u; $fails = $all[$fk] ?? ['n' => 0, 't' => 0];
         if ($fails['n'] >= 5 && time() - $fails['t'] < 900) $err = 'Demasiados intentos. Espera 15 minutos.';
-        elseif (!empty($admin['hash']) && password_verify($_POST['pass'] ?? '', $admin['hash'])) { store_put('login_fails', ['n' => 0, 't' => 0]); session_regenerate_id(true); $_SESSION['admin'] = 1; header('Location: index.php'); exit; }
-        else { store_put('login_fails', ['n' => $fails['n'] + 1, 't' => time()]); $err = 'Contraseña incorrecta.'; }
+        else {
+            $who = null;
+            if (in_array($u, ['', 'pablo', 'admin'], true)) { if (!empty($admin['hash']) && password_verify($pass, $admin['hash'])) $who = ['admin', 1]; }
+            else foreach (clients_all() as $slug => $c) {
+                if (mb_strtolower((string)($c['usuario'] ?? '')) !== $u) continue;
+                if (empty($c['desactivado']) && !empty($c['hash']) && password_verify($pass, $c['hash'])) $who = ['cliente', $slug];
+                break;
+            }
+            if ($who) { unset($all[$fk]); store_put('login_fails', $all); session_regenerate_id(true); unset($_SESSION['admin'], $_SESSION['cliente']);
+                $_SESSION[$who[0]] = $who[1]; header('Location: index.php'); exit; }
+            $all[$fk] = ['n' => $fails['n'] + 1, 't' => time()]; store_put('login_fails', $all); $err = 'Usuario o contraseña incorrectos.';
+        }
+    } elseif (client_session() && $act === 'logout') { session_destroy(); header('Location: index.php'); exit;
     } elseif (is_admin()) {
         csrf_check();
         if ($act === 'config') {
@@ -32,6 +46,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($act === 'newkey') { cfg_set(['mcp_key' => bin2hex(random_bytes(24))]); $_SESSION['flash'] = 'Nueva clave del conector creada: actualiza la URL en Claude.'; }
         elseif ($act === 'disconnect') { $t = store_get('tokens'); unset($t[$_POST['p'] ?? '']); store_put('tokens', $t); $_SESSION['flash'] = 'Desconectado.'; }
         elseif ($act === 'logout') { session_destroy(); header('Location: index.php'); exit; }
+        elseif ($act === 'cliente') {
+            $all = clients_all(); $slug = (string)($_POST['slug'] ?? ''); $nuevo = $slug === '' || !isset($all[$slug]);
+            $nombre = trim((string)($_POST['nombre'] ?? '')); $usuario = mb_strtolower(trim((string)($_POST['usuario'] ?? ''))); $pw = (string)($_POST['pass'] ?? '');
+            if ($nuevo) { $slug = client_slug($nombre); $b = $slug; $i = 2; while (isset($all[$slug])) $slug = $b . '-' . $i++; }
+            $dup = false; foreach ($all as $k => $c) if ($k !== $slug && mb_strtolower((string)($c['usuario'] ?? '')) === $usuario) $dup = true;
+            if ($nombre === '') $e = 'Pon el nombre del negocio.';
+            elseif (!preg_match('/^[a-z0-9._-]{3,40}$/', $usuario)) $e = 'El usuario debe tener entre 3 y 40 caracteres: letras sin acentos, números, punto, guion o guion bajo.';
+            elseif (in_array($usuario, ['pablo', 'admin'], true) || $dup) $e = 'Ese usuario ya existe: elige otro.';
+            elseif (($nuevo || $pw !== '') && strlen($pw) < 10) $e = 'La contraseña del cliente debe tener al menos 10 caracteres.';
+            else $e = '';
+            if ($e) { $_SESSION['flash'] = 'Error: ' . $e; header('Location: index.php?v=clientes&e=' . urlencode($nuevo ? 'nuevo' : $slug)); exit; }
+            $c = $all[$slug] ?? ['creado' => date('c')];
+            $c['nombre'] = $nombre; $c['usuario'] = $usuario; $c['web'] = trim((string)($_POST['web'] ?? ''));
+            foreach (CLIENT_KEYS as $k) $c[$k] = trim((string)($_POST[$k] ?? ''));
+            $c['desactivado'] = !empty($_POST['desactivado']);
+            if ($pw !== '') $c['hash'] = password_hash($pw, PASSWORD_DEFAULT);
+            $all[$slug] = $c; store_put('clientes', $all);
+            $cm = store_get('clientes_meta', []); unset($cm[$slug]); store_put('clientes_meta', $cm);   // por si ha cambiado la página
+            store_put('dash_cache_' . $slug, []);
+            $_SESSION['flash'] = 'Cliente «' . $nombre . '» guardado.' . ($pw !== '' ? ' Pásale su usuario y contraseña por un canal privado.' : '');
+            header('Location: index.php?v=clientes'); exit;
+        }
         header('Location: index.php'); exit;
     }
 }
@@ -57,10 +93,12 @@ code,.mono{font:12.5px ui-monospace,Consolas,monospace;word-break:break-all;back
 .flash{background:#10213F;border:1px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:16px}.err{background:#3A1515;border-color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px solid var(--line);padding:6px 4px;vertical-align:top}td:first-child{white-space:nowrap;color:var(--blue)}
 .login{max-width:380px;margin:12vh auto}
+.pick{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 16px}.pick a{color:var(--mut);text-decoration:none;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:20px;padding:5px 12px}.pick a.on{color:#fff;background:var(--blue);border-color:var(--blue)}
+select{width:100%;background:#070B12;border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 11px;font:14px system-ui}
 .tabs{display:flex;gap:6px;margin:-6px 0 18px;border-bottom:1px solid var(--line)}.tabs a{color:var(--mut);text-decoration:none;padding:9px 12px;font-weight:600;font-size:14px;border-bottom:2px solid transparent;margin-bottom:-1px}.tabs a.on{color:var(--txt);border-color:var(--blue)}
 </style></head><body><div class="w">
-<header><img src="/img/icono-innovai-180.png" alt=""><div><h1>innov<span>AI</span> Hub</h1><div class="sub">Tu centro propio de redes y Google · v<?= HUB_VERSION ?></div></div>
-<?php if (is_admin()): ?><form method="post" style="margin-left:auto"><input type="hidden" name="csrf" value="<?= csrf() ?>"><button class="sec" name="act" value="logout">Salir</button></form><?php endif; ?></header>
+<header><img src="/img/icono-innovai-180.png" alt=""><div><h1>innov<span>AI</span> Hub</h1><div class="sub"><?= client_session() && !is_admin() ? h(client_get(client_session())['nombre'] ?? '') . ' · resultados de tu negocio' : 'Tu centro propio de redes y Google · v' . HUB_VERSION ?></div></div>
+<?php if (is_admin() || client_session()): ?><form method="post" style="margin-left:auto"><input type="hidden" name="csrf" value="<?= csrf() ?>"><button class="sec" name="act" value="logout">Salir</button></form><?php endif; ?></header>
 <?php if ($err): ?><div class="flash err"><?= h($err) ?></div><?php endif; ?>
 <?php if ($flash): ?><div class="flash<?= str_starts_with($flash, 'Error') ? ' err' : '' ?>"><?= h($flash) ?></div><?php endif; ?>
 <?php if (empty($admin['hash'])): ?>
@@ -68,12 +106,18 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{border-bottom:1px so
 <form method="post"><input type="hidden" name="act" value="setup"><label>Código de instalación</label><input name="install" autocomplete="off" required>
 <label>Contraseña nueva (mín. 10 caracteres)</label><input type="password" name="pass" required autocomplete="new-password"><label>Repite la contraseña</label><input type="password" name="pass2" required autocomplete="new-password">
 <p><button>Crear y entrar</button></p></form></div>
+<?php elseif (!is_admin() && client_session()): $HUB_PANEL_C = client_session(); ?>
+<?php include __DIR__ . '/lib/panel.html.php'; ?>
 <?php elseif (!is_admin()): ?>
-<div class="card login"><h2>Entrar</h2><form method="post"><input type="hidden" name="act" value="login"><label>Contraseña</label><input type="password" name="pass" required autocomplete="current-password"><p><button>Entrar</button></p></form></div>
+<div class="card login"><h2>Entrar</h2><form method="post"><input type="hidden" name="act" value="login"><label>Usuario</label><input name="usuario" autocomplete="username" autocapitalize="none" spellcheck="false"><label>Contraseña</label><input type="password" name="pass" required autocomplete="current-password"><p><button>Entrar</button></p></form></div>
 <?php else: $m = tok('meta'); $g = tok('google'); $l = tok('linkedin'); $base = base_url(); ?>
-<?php $v = ($_GET['v'] ?? 'resultados') === 'ajustes' ? 'ajustes' : 'resultados'; ?>
-<nav class="tabs"><a href="?v=resultados" class="<?= $v === 'resultados' ? 'on' : '' ?>">Resultados</a><a href="?v=ajustes" class="<?= $v === 'ajustes' ? 'on' : '' ?>">Conexiones y ajustes</a></nav>
-<?php if ($v === 'resultados'): include __DIR__ . '/lib/panel.html.php'; else: ?>
+<?php $v = in_array($_GET['v'] ?? '', ['ajustes', 'clientes'], true) ? $_GET['v'] : 'resultados'; $clis = clients_all();
+$HUB_PANEL_C = isset($clis[$_GET['c'] ?? '']) ? $_GET['c'] : ''; ?>
+<nav class="tabs"><a href="?v=resultados" class="<?= $v === 'resultados' ? 'on' : '' ?>">Resultados</a><a href="?v=clientes" class="<?= $v === 'clientes' ? 'on' : '' ?>">Clientes (<?= count($clis) ?>)</a><a href="?v=ajustes" class="<?= $v === 'ajustes' ? 'on' : '' ?>">Conexiones y ajustes</a></nav>
+<?php if ($v === 'resultados'): ?>
+<?php if ($clis): ?><div class="pick"><a href="?v=resultados" class="<?= $HUB_PANEL_C === '' ? 'on' : '' ?>">innovAI</a><?php foreach ($clis as $k => $c): ?><a href="?v=resultados&amp;c=<?= h($k) ?>" class="<?= $HUB_PANEL_C === $k ? 'on' : '' ?>"><?= h($c['nombre'] ?? $k) ?><?= !empty($c['desactivado']) ? ' (desactivado)' : '' ?></a><?php endforeach; ?></div><?php endif; ?>
+<?php include __DIR__ . '/lib/panel.html.php'; ?>
+<?php elseif ($v === 'clientes'): include __DIR__ . '/lib/clientes.html.php'; else: ?>
 <?php $lok = $l && ($l['expires'] ?? 0) > time(); $lsoon = $lok && $l['expires'] - time() < 10 * 86400; $todo = $m && $g && $lok && !$lsoon; ?>
 <div class="card"><h2>Conexiones</h2>
 <?php if ($todo): ?><div class="okall">✓ Todo conectado. No tienes que pulsar nada: las conexiones se renuevan solas.</div><?php endif; ?>

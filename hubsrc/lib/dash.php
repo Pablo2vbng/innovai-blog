@@ -15,7 +15,8 @@ function dash_try(callable $fn): array {
     catch (Throwable $e) { return ['ok' => false, 'error' => dash_err($e->getMessage())]; }
 }
 function dash_err(string $m): string {
-    if (str_contains($m, 'no está conectado') || str_contains($m, 'no conectado')) return 'Sin conectar';
+    if (str_contains($m, 'no está conectado') || str_contains($m, 'no conectado') || stripos($m, 'sin conectar') !== false || str_contains($m, 'Falta el ID') || str_contains($m, 'Elige la ficha')) return 'Sin conectar';
+    if (str_contains($m, 'no administra la página')) return 'Tu cuenta de Facebook no administra su página';
     if (str_contains($m, 'Quota exceeded') || str_contains($m, '429')) return 'Pendiente de que Google apruebe el acceso';
     return mb_substr($m, 0, 160);
 }
@@ -81,7 +82,9 @@ function dash_build(): array {
             'paginas' => array_map(fn($r) => [$r['pagePath'], (int)$r['screenPageViews']], $pag), 'sesiones_ia' => $ia];
     });
 
-    $d['merchant'] = dash_try(function () {
+    $cli = client_cur();
+    $na = ['ok' => false, 'error' => 'No aplica'];
+    $d['merchant'] = ($cli && !cfg('merchant_id')) ? $na : dash_try(function () {
         $p = dash_tool('merchant_productos');
         $ok = 0; $mal = []; foreach ($p as $x) { $aprob = false; foreach ($x['estado'] ?? [] as $s) if (!empty($s['approvedCountries'])) $aprob = true;
             if ($aprob && empty($x['problemas'])) $ok++; else $mal[] = ['titulo' => $x['titulo'], 'problema' => $x['problemas'][0]['description'] ?? 'No aprobado']; }
@@ -90,17 +93,22 @@ function dash_build(): array {
 
     $d['business'] = dash_try(fn() => dash_tool('business_estadisticas', ['dias' => 28]));
 
-    $d['chatgpt'] = dash_try(fn() => ['productos' => count(chatgpt_products())]);
+    $d['business'] = ($cli && !cfg('gbp_location')) ? ['ok' => false, 'error' => 'Sin conectar'] : $d['business'];
+    $d['chatgpt'] = $cli ? $na : dash_try(fn() => ['productos' => count(chatgpt_products())]);
+    $d['tiktok'] = ['ok' => false, 'error' => 'Sin conectar'];
+    if ($cli) { $c = client_get($cli); $d['cliente'] = ['nombre' => $c['nombre'] ?? $cli, 'web' => $c['web'] ?? '']; }
 
     $l = tok('linkedin');
     $d['linkedin'] = ['ok' => !empty($l) && ($l['expires'] ?? 0) > time(), 'd' => ['nombre' => $l['name'] ?? '', 'caduca' => isset($l['expires']) ? date('d/m/Y', $l['expires']) : null]];
     return $d;
 }
 
-function dash_data(bool $refresh = false): array {
-    $c = store_get('dash_cache', []);
-    if (!$refresh && !empty($c['data']) && time() - ($c['at'] ?? 0) < DASH_TTL) return $c['data'];
+function dash_data(bool $refresh = false, int $min_refresh = 0): array {
+    $name = 'dash_cache' . (client_cur() ? '_' . client_cur() : '');
+    $c = store_get($name, []);
+    $age = time() - ($c['at'] ?? 0);
+    if (!empty($c['data']) && ($age < $min_refresh || (!$refresh && $age < DASH_TTL))) return $c['data'];
     $data = dash_build();
-    store_put('dash_cache', ['at' => time(), 'data' => $data]);
+    store_put($name, ['at' => time(), 'data' => $data]);
     return $data;
 }

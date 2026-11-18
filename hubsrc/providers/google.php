@@ -36,7 +36,7 @@ function gapi(string $method, string $url, array $opt = []) {
 function d_ago(int $n): string { return date('Y-m-d', strtotime("-$n days")); }
 
 // ---- Search Console ----
-function gsc_site(?string $s): string { return $s ?: cfg('gsc_site', 'sc-domain:innovai.es'); }
+function gsc_site(?string $s): string { $v = $s ?: cfg('gsc_site', 'sc-domain:innovai.es'); if (!$v) throw new RuntimeException('Search Console sin conectar'); return $v; }
 tool('search_console_sitios', 'Lista las propiedades de Search Console a las que tienes acceso.', [],
     fn($a) => gapi('GET', 'https://www.googleapis.com/webmasters/v3/sites')['siteEntry'] ?? []);
 tool('search_console_consultas', 'Rendimiento en Google Search: clics, impresiones, CTR y posición por consulta, página, fecha, país o dispositivo.', [

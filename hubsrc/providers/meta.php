@@ -132,6 +132,11 @@ tool('facebook_responder_comentario', 'Responde a un comentario en la página de
 
 tool('meta_diagnostico', 'Comprueba la conexión con Meta: permisos concedidos e Instagram vinculado a la página. Si encuentra la cuenta de Instagram, la guarda.', [],
     function ($a) { $t = tok('meta'); if (!$t) throw new RuntimeException('Meta no está conectado.');
+        if (client_cur()) { // vista de un cliente: solo su página, sin tocar las demás
+            $page = meta_g('GET', $t['page_id'], ['fields' => 'name,instagram_business_account{id,username},connected_instagram_account{id,username}']);
+            $ig = $page['instagram_business_account'] ?? $page['connected_instagram_account'] ?? null;
+            if ($ig) { $t['ig_id'] = $ig['id']; $t['ig_username'] = $ig['username'] ?? null; tok_set('meta', $t); }
+            return ['cliente' => client_cur(), 'pagina' => $page, 'instagram_guardado' => $ig]; }
         $perm = meta_g('GET', 'me/permissions', [], $t['user_token'])['data'] ?? [];
         $page = meta_g('GET', $t['page_id'], ['fields' => 'name,instagram_business_account{id,username},connected_instagram_account{id,username}']);
         $ig = $page['instagram_business_account'] ?? $page['connected_instagram_account'] ?? null;
