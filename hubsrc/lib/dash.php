@@ -17,6 +17,7 @@ function dash_try(callable $fn): array {
 function dash_err(string $m): string {
     if (str_contains($m, 'no está conectado') || str_contains($m, 'no conectado') || stripos($m, 'sin conectar') !== false || str_contains($m, 'Falta el ID') || str_contains($m, 'Elige la ficha')) return 'Sin conectar';
     if (str_contains($m, 'no administra la página')) return 'Tu cuenta de Facebook no administra su página';
+    if (stripos($m, 'sufficient permission') !== false || stripos($m, 'permission denied') !== false || stripos($m, 'PERMISSION_DENIED') !== false) return 'Pendiente de que el negocio dé acceso a innovAI';
     if (str_contains($m, 'Quota exceeded') || str_contains($m, '429')) return 'Pendiente de que Google apruebe el acceso';
     return mb_substr($m, 0, 160);
 }
