@@ -3,8 +3,8 @@
    PUBLICO = true  → lo ve todo el mundo. Con ?estilo=viejo se vuelve al anterior en ese navegador.
    Para volver atrás del todo: poner PUBLICO = false. */
 (function () {
-  var PUBLICO = false;
-  var V = '2';
+  var PUBLICO = true;
+  var V = '3';
   try {
     var q = location.search, k = 'innovai_estilo', ls = window.localStorage;
     if (/[?&]estilo=nuevo\b/.test(q)) ls.setItem(k, 'nuevo');
