@@ -8,6 +8,12 @@ function init() {
   document.querySelectorAll('img[src*="/img/logo-innovai.svg"]').forEach(function (img) {
     img.setAttribute('src', '/img/logo-innovai-tinta.svg');
   });
+  // Tienda: ilustraciones claras de las tarjetas NFC
+  [['tarjeta-google-instagram.webp', 'tarjeta-google-instagram-claro.webp'], ['tarjeta-contacto.webp', 'tarjeta-contacto-claro.webp']].forEach(function (par) {
+    document.querySelectorAll('img[src*="/img/tienda/' + par[0] + '"]').forEach(function (img) {
+      img.setAttribute('src', '/img/tienda/' + par[1] + '?v=1');
+    });
+  });
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
