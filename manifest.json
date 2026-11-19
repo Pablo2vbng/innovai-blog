@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "nfc-o-qr-negocio",
+      "title": "NFC o QR: cuál es mejor para tu negocio (y cuándo usar los dos)",
+      "description": "¿NFC o QR para tu negocio? Comparativa honesta: compatibilidad, coste, rapidez y qué usar para reseñas de Google, carta, tarjeta de visita o WhatsApp.",
+      "category": "Pymes",
+      "date": "2026-11-19",
+      "publish_at": "2026-11-20T08:25:38+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "diseno-web-ontinyent",
       "title": "Diseño web en Ontinyent: guía para negocios y pymes",
       "description": "Diseño web en Ontinyent: qué tipo de web necesita tu negocio, qué debe incluir el presupuesto, web bilingüe y cómo aparecer en Google en la Vall d'Albaida.",
