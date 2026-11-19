@@ -4,7 +4,7 @@
    Para volver atrás del todo: poner PUBLICO = false. */
 (function () {
   var PUBLICO = false;
-  var V = '1';
+  var V = '2';
   try {
     var q = location.search, k = 'innovai_estilo', ls = window.localStorage;
     if (/[?&]estilo=nuevo\b/.test(q)) ls.setItem(k, 'nuevo');
