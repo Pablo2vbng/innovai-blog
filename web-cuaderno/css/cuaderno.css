@@ -233,6 +233,7 @@ html.cuaderno .spin,html.cuaderno .dg-load i{border-color:rgba(30,42,58,.15);bor
 /* Tienda */
 html.cuaderno .visual{background-color:var(--paper-2);background-image:radial-gradient(rgba(30,42,58,.12) 1px,transparent 1px);background-size:18px 18px;border-color:var(--ink)}
 html.cuaderno .visual img.photo{background:transparent}
+html.cuaderno .visual:has(img.photo) .ill{visibility:hidden}
 html.cuaderno .visual .note{background:#FFFFFF;color:var(--ink);border:1.5px solid var(--ink)}
 html.cuaderno .product{overflow:hidden}
 html.cuaderno .opt{background:#FFFFFF;border:2px solid var(--line-2)}
