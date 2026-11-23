@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "diseno-web-gandia",
+      "title": "Diseño web en Gandia: guía para negocios de La Safor",
+      "description": "Diseño web en Gandia: qué web necesita tu negocio, reservas e idiomas para la temporada de playa, qué debe incluir el presupuesto y cómo salir en Google.",
+      "category": "Pymes",
+      "date": "2026-11-23",
+      "publish_at": "2026-11-24T08:21:37+00:00",
+      "status": "pendiente",
+      "rev": 1
+    },
+    {
       "slug": "nfc-o-qr-negocio",
       "title": "NFC o QR: cuál es mejor para tu negocio (y cuándo usar los dos)",
       "description": "¿NFC o QR para tu negocio? Comparativa honesta: compatibilidad, coste, rapidez y qué usar para reseñas de Google, carta, tarjeta de visita o WhatsApp.",
@@ -52,13 +62,13 @@
     },
     {
       "slug": "tarjeta-nfc-resenas-google",
-      "title": "Tarjeta NFC para reseñas de Google: cómo funciona y cómo usarla",
-      "description": "Qué es una tarjeta NFC para reseñas de Google, qué móviles la leen, cómo configurarla paso a paso, dónde colocarla y qué normas de Google cumplir.",
+      "title": "Tarjetas NFC para reseñas de Google: qué son y cómo usarlas",
+      "description": "Tarjetas NFC para reseñas de Google: qué son, tipos (tarjeta, soporte y pegatina), qué móviles las leen, cómo configurarlas paso a paso y normas de Google.",
       "category": "Pymes",
-      "date": "2026-11-12",
-      "publish_at": "2026-11-12T08:57:04+00:00",
-      "status": "aprobado",
-      "rev": 2
+      "date": "2026-11-23",
+      "publish_at": "2026-11-24T08:21:37+00:00",
+      "status": "pendiente",
+      "rev": 3
     },
     {
       "slug": "verifactu-2028-pymes-autonomos",
