@@ -1,0 +1,15 @@
+
+# 10. WEB 2026: DIRECCIÓN CORTA DE SEO LOCAL (la página sigue siendo google-business-seo-local.html)
+RedirectMatch 301 ^/seo-local-empresas(\.html)?/?$ https://innovai.es/google-business-seo-local.html
+RedirectMatch 301 ^/geo/?$ https://innovai.es/geo-posicionamiento-inteligencia-artificial.html
+RedirectMatch 301 ^/auditoria/?$ https://innovai.es/auditoria-gratuita.html
+
+# 11. COPIAS Y ARCHIVOS INTERNOS: NO PÚBLICOS (tienda.backup-*, *.bak*, *.txt de copias, package.json, README)
+<FilesMatch "(\.backup-|\.bak|backup-.*\.txt$|^package(-lock)?\.json$|^README\.md$|^_wtest\.txt$)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+RedirectMatch 404 ^/(node_modules|_diag)(/|$)
+
+# 12. ZONA DE PRUEBAS DEL REDISEÑO 2026: YA PUBLICADO, REDIRIGE A LA WEB REAL
+RedirectMatch 301 ^/preview-2026/(.*)$ https://innovai.es/$1

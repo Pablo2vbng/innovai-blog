@@ -1,0 +1,21 @@
+# robots.txt de innovai.es — permite buscadores y rastreadores de IA (actualizado 26/11/2026)
+# Los rastreadores con IA se nombran para dejar claro que tienen acceso.
+User-agent: *
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /_diag/
+Disallow: /node_modules/
+Disallow: /preview-2026/
+Disallow: /registro-ias/
+Disallow: /altacliente/
+Disallow: /saas_citas/
+Disallow: /*?estilo=
+
+Sitemap: https://innovai.es/sitemap.xml
+Sitemap: https://innovai.es/blog/sitemap-blog.xml
