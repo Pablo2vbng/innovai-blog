@@ -141,5 +141,5 @@ html.cuaderno.sobrio .lk a.it.hl{background:var(--acento-suave);border-color:rgb
 html.cuaderno.sobrio .prose blockquote{background:var(--acento-suave)}
 
 /* Ritmo vertical algo más compacto */
-html.cuaderno.sobrio section{padding-top:84px;padding-bottom:84px}
-@media (max-width:640px){html.cuaderno.sobrio section{padding-top:64px;padding-bottom:64px}html.cuaderno.sobrio .eyebrow{font-size:12px}}
+html.cuaderno.sobrio section:not(.hero){padding-top:84px;padding-bottom:84px}
+@media (max-width:640px){html.cuaderno.sobrio section:not(.hero){padding-top:64px;padding-bottom:64px}html.cuaderno.sobrio .eyebrow{font-size:12px}}
